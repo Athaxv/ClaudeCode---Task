@@ -1,11 +1,14 @@
-// packages/schema/types.ts
+import { z } from "zod"
 
-export type ComponentType =
-    | "Button"
-    | "Card"
-    | "Input"
-    | "Table"
-    | "Modal"
-    | "Sidebar"
-    | "Navbar"
-    | "Chart"
+export const ComponentTypeEnum = z.enum([
+    "Button",
+    "Card",
+    "Input",
+    "Table",
+    "Modal",
+    "Sidebar",
+    "Navbar",
+    "Chart"
+])
+
+export type ComponentType = z.infer<typeof ComponentTypeEnum>

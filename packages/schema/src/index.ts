@@ -1,2 +1,3 @@
-export * from "./ui-schema.js";
-// Export other existing schemas if needed, but ensure index.ts exists
+export * from "./types.js"
+export * from "./ast.js"
+export * from "./root.js"
