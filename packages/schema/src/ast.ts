@@ -1,8 +1,4 @@
-// packages/schema/ast.ts
+import { type ComponentNode, ComponentSchema } from "./ui-schema.js";
 
-export interface UIComponentNode {
-    id: string
-    type: ComponentType
-    props: Record<string, any>
-    children?: UIComponentNode[]
-}
+export type UIComponentNode = ComponentNode;
+export const UIComponentSchema = ComponentSchema;

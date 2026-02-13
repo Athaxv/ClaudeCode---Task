@@ -1,6 +1,6 @@
 // packages/versioning/types.ts
 
-import { UIComponentNode } from "@repo/schema"
+import { type UIComponentNode } from "./ast.js"
 
 export interface Version {
     id: string
