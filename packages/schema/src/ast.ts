@@ -25,3 +25,5 @@ export const UIComponentNodeSchema: z.ZodType<any> = z.lazy(() =>
             }
         })
 )
+
+export type UIComponentNode = z.infer<typeof UIComponentNodeSchema>
