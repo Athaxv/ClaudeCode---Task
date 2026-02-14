@@ -1,15 +1,17 @@
 import { v4 as uuidv4 } from "uuid"
-import { diffAST } from "./diff.js" // wherever yours is
+import { diffAST } from "./diff.js"
 import { type Version } from "./types.js"
 
 export class VersionStore {
-    private versions: Version[] = []
-    private currentVersionId: string | null = null
+    private sessions: Map<string, Version[]> = new Map()
+    private currentVersion: Map<string, string> = new Map()
 
-    create(ast: any, explanation: string) {
+    create(sessionId: string, ast: any, explanation: string) {
+        const versions = this.sessions.get(sessionId) || []
+
         const previous =
-            this.versions.length > 0
-                ? this.versions[this.versions.length - 1].ast
+            versions.length > 0
+                ? versions[versions.length - 1].ast
                 : null
 
         const diff = previous
@@ -24,33 +26,42 @@ export class VersionStore {
             diff
         }
 
-        this.versions.push(version)
-        this.currentVersionId = version.id
+        versions.push(version)
+
+        this.sessions.set(sessionId, versions)
+        this.currentVersion.set(sessionId, version.id)
 
         return version
     }
 
-    get(id: string) {
-        return this.versions.find(v => v.id === id) || null
+    get(sessionId: string, id: string) {
+        const versions = this.sessions.get(sessionId) || []
+        return versions.find(v => v.id === id) || null
     }
 
-    getCurrent() {
-        if (!this.currentVersionId) return null
-        return this.get(this.currentVersionId)
+    getCurrent(sessionId: string) {
+        const currentId = this.currentVersion.get(sessionId)
+        if (!currentId) return null
+        return this.get(sessionId, currentId)
     }
 
-    getAll() {
-        return this.versions
+    getAll(sessionId: string) {
+        return this.sessions.get(sessionId) || []
     }
 
-    rollback(id: string) {
-        const version = this.get(id)
+    rollback(sessionId: string, id: string) {
+        const version = this.get(sessionId, id)
         if (!version) {
             throw new Error("Version not found")
         }
 
-        this.currentVersionId = id
+        this.currentVersion.set(sessionId, id)
         return version
+    }
+
+    clear(sessionId: string) {
+        this.sessions.delete(sessionId)
+        this.currentVersion.delete(sessionId)
     }
 }
 
