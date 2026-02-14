@@ -1,76 +1,128 @@
-# Turbo Stack Monorepo
+# Deterministic UI Generator (Claude Code Style)
 
-This is a full-stack monorepo scaffolded with `create-turbo-starter`. It includes a Next.js frontend, Express backend, WebSocket server, and a shared Prisma database package, all powered by Turborepo.
+A powerful, AI-driven engine that generates **deterministic, high-quality UI code** from natural language prompts. Built with a structured **Agent Pipeline** (Planner → Generator → Explainer) and a strict **AST Schema**, ensuring reliable and version-controlled outputs.
 
-## Project Structure
+## 🚀 Key Features
+
+- **Deterministic Generation**: Uses a structured AST (Abstract Syntax Tree) to guarantee valid, type-safe UI components every time.
+- **Agent Pipeline**:
+  - **Planner**: Deconstructs user requests into a step-by-step execution plan.
+  - **Generator**: Converts the plan into a precise JSON AST.
+  - **Explainer**: Generates a natural language summary of changes.
+- **Versioning & Rollback**: Built-in version control system (`@repo/versioning`) to track every change and restore previous states instantly.
+- **Live Preview**: Real-time rendering of the generated UI with a "Claude Code" inspired interface.
+- **Multi-Model Support**: Powered by Groq/LLMs for varied model selection.
+
+## 🏗 Architecture
+
+The project is a **Turborepo** monorepo structured as follows:
 
 ```
 .
 ├── apps/
-│   ├── frontend/    # Next.js 15 App Router (Port 3000)
-│   ├── backend/     # Express.js Server (Port 5000)
-│   └── websocket/   # Native WebSocket Server (Port 8080)
+│   ├── frontend/        # Next.js 15 (App Router) - The interactive playground
+│   └── backend/         # Express.js - API for the Agent Pipeline
 ├── packages/
-│   ├── db/          # Prisma Schema & Client (NeonDB/Postgres)
-│   ├── ui/          # Shared React UI Components
-│   └── ...
-├── package.json
-└── turbo.json
+│   ├── agent/           # Core Logic: Planner, Generator, Explainer
+│   ├── schema/          # Zod schemas defining the UI AST (Container, Button, etc.)
+│   ├── versioning/      # State management and history tracking
+│   └── db/              # Prisma configurations
+└── ...
 ```
 
-## Getting Started
+## 🛠 Tech Stack
 
-### 1. Install Dependencies
+- **Frameworks**: Next.js 15, Express.js
+- **Language**: TypeScript (Strict Mode)
+- **Styling**: TailwindCSS, Shadcn UI
+- **AI/LLM**: Groq SDK, Vercel AI SDK
+- **Database**: PostgreSQL (via Prisma)
+- **Tooling**: Turborepo, pnpm, Docker
 
-Run the following command from the root directory to install dependencies for all workspaces:
+## ⚡ Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm 9+ (`npm install -g pnpm`)
+- PostgreSQL database
+- Groq API Key
+
+### 1. Installation
+
+Clone the repository and install dependencies:
 
 ```bash
+git clone <repo-url>
+cd <repo-name>
 pnpm install
 ```
 
-### 2. Database Setup
+### 2. Environment Setup
 
-Ensure your `.env` files in `packages/db` and `apps/backend` contain the correct `DATABASE_URL`.
+Copy the example environment files and configure them:
 
-Then, verify the Prisma client is generated:
-
-```bash
-pnpm run db:generate
+**Apps/Backend:**
+Create `apps/backend/.env`:
+```env
+PORT=4000
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
+GROQ_API_KEY="gsk_..."
 ```
 
-If you need to push the schema to your database (careful in production):
-
-```bash
-pnpm run db:push
+**Packages/DB:**
+Create `packages/db/.env`:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
 ```
 
-### 3. Start Development
+**Apps/Frontend:**
+Create `apps/frontend/.env`:
+```env
+NEXT_PUBLIC_API_URL="http://localhost:4000"
+```
 
-To start all applications (Frontend, Backend, WebSocket) simultaneously:
+### 3. Database Setup
+
+Generate the Prisma client and push the schema:
+
+```bash
+pnpm db:generate
+pnpm db:push
+```
+
+### 4. Running the App
+
+Start the entire stack (Frontend + Backend) in development mode:
 
 ```bash
 pnpm dev
 ```
 
-Turborepo will manage the execution and output of all services.
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend**: [http://localhost:4000](http://localhost:4000)
 
-## Services
+## 🐳 Docker Deployment
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **WebSocket**: ws://localhost:8080
+The project includes a production-ready `Dockerfile`.
 
-## Scripts
+1. **Build the image**:
+   ```bash
+   docker build -t ui-generator-backend .
+   ```
 
-- `pnpm dev`: Start all apps in development mode.
-- `pnpm build`: Build all apps and packages.
-- `pnpm run db:generate`: Generate Prisma client.
-- `pnpm run db:push`: Push Prisma schema to the database.
+2. **Run the container**:
+   ```bash
+   docker run -p 4000:4000 \
+     -e DATABASE_URL="postgresql://..." \
+     -e GROQ_API_KEY="gsk_..." \
+     ui-generator-backend
+   ```
 
-## Technologies
+## 🤝 Contributing
 
-- [Turborepo](https://turbo.build/repo)
-- [Next.js](https://nextjs.org/)
-- [Express.js](https://expressjs.com/)
-- [Prisma](https://www.prisma.io/)
-- [TailwindCSS](https://tailwindcss.com/)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
