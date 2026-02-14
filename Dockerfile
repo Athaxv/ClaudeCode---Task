@@ -5,7 +5,7 @@ RUN npm install -g pnpm@9.0.0
 WORKDIR /app
 
 # Copy workspace config and lockfile
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml turbo.json .npmrc ./
 
 # Copy all workspace package sources
 COPY apps/backend/ apps/backend/
