@@ -6,7 +6,8 @@ import {
     ModalPropsSchema,
     SidebarPropsSchema,
     NavbarPropsSchema,
-    ChartPropsSchema
+    ChartPropsSchema,
+    ContainerPropsSchema
 } from "./component/index.js"
 
 export const ComponentPropsMap = {
@@ -17,5 +18,6 @@ export const ComponentPropsMap = {
     Modal: ModalPropsSchema,
     Sidebar: SidebarPropsSchema,
     Navbar: NavbarPropsSchema,
-    Chart: ChartPropsSchema
+    Chart: ChartPropsSchema,
+    Container: ContainerPropsSchema
 }

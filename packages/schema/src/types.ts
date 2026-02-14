@@ -8,7 +8,8 @@ export const ComponentTypeEnum = z.enum([
     "Modal",
     "Sidebar",
     "Navbar",
-    "Chart"
+    "Chart",
+    "Container"
 ])
 
 export type ComponentType = z.infer<typeof ComponentTypeEnum>

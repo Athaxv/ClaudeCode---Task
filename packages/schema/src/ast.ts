@@ -5,7 +5,7 @@ import { ComponentPropsMap } from "./componentProp.js"
 export const UIComponentNodeSchema: z.ZodType<any> = z.lazy(() =>
     z
         .object({
-            id: z.string().uuid(),
+            id: z.string().uuid().optional(),
             type: ComponentTypeEnum,
             props: z.any(),
             children: z.array(UIComponentNodeSchema).optional()

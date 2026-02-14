@@ -1,18 +1,24 @@
-import "dotenv/config";
-import express from "express";
-import { prisma } from "@repo/db";
+import express from "express"
+import cors from "cors"
+import dotenv from "dotenv"
 
-const app = express();
+import generateRoute from "./routes/generate.js"
+import rollbackRoute from "./routes/rollback.js"
+import versionsRoute from "./routes/versions.js"
 
-app.get("/", async (req, res) => {
-    try {
-        await prisma.$connect();
-        res.send("Hello World! Database connected.");
-    } catch (e) {
-        res.status(500).send("Database connection failed");
-    }
-});
+dotenv.config()
 
-app.listen(5000, () => {
-    console.log("Server started on port 5000");
-});
+const app = express()
+
+app.use(cors())
+app.use(express.json())
+
+app.use("/generate", generateRoute)
+app.use("/rollback", rollbackRoute)
+app.use("/versions", versionsRoute)
+
+const PORT = 4000
+
+app.listen(PORT, () => {
+    console.log(`API running on port ${PORT}`)
+})

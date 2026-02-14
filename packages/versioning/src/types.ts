@@ -5,6 +5,11 @@ export interface Version {
     ast: UIComponentNode
     explanation: string
     timestamp: number
+    diff: {
+        added: string[]
+        removed: string[]
+        modified: string[]
+    }
 }
 
 export interface DiffResult {
