@@ -4,12 +4,20 @@ import { versionStore } from "@repo/versioning"
 const router: Router = Router()
 
 router.get("/", (req, res) => {
-    const versions = versionStore.getAll()
+    const sessionId = req.query.sessionId as string
+
+    if (!sessionId) {
+        return res.status(400).json({ error: "SessionId required" })
+    }
+
+    const versions = versionStore.getAll(sessionId)
 
     return res.json(
-        versions.map((v: any) => ({
+        versions.map((v) => ({
             id: v.id,
-            timestamp: v.timestamp
+            timestamp: v.timestamp,
+            explanation: v.explanation,
+            diff: v.diff
         }))
     )
 })

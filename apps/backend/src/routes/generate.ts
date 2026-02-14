@@ -7,22 +7,24 @@ const router: Router = Router()
 
 router.post("/", async (req, res) => {
     try {
-        const { message } = req.body
+        const { message, sessionId } = req.body
 
         if (!message) {
             return res.status(400).json({ error: "Message required" })
         }
 
+        if (!sessionId) {
+            return res.status(400).json({ error: "SessionId required" })
+        }
+
         // 1️⃣ Get current version
-        const currentVersion = versionStore.getCurrent()
+        const currentVersion = versionStore.getCurrent(sessionId)
         const currentAst = currentVersion?.ast ?? null
-        console.log("Current AST before generation:", JSON.stringify(currentAst, null, 2))
 
         // 2️⃣ Run Planner
         const plan = await runPlanner(message, currentAst)
-        console.log("Planner output:", JSON.stringify(plan, null, 2))
 
-        // 3️⃣ Run Generator
+        // 3️⃣ Generate or Apply Operations
         let newAst
 
         if (plan.modificationType === "full" || !currentAst) {
@@ -30,31 +32,24 @@ router.post("/", async (req, res) => {
         } else {
             newAst = applyOperations(currentAst, plan.operations)
         }
-        console.log("New AST after generation:", JSON.stringify(newAst, null, 2))
 
+        // 4️⃣ Store version (this computes diff internally)
+        const newVersion = versionStore.create(
+            sessionId,
+            newAst,
+            "Pending explanation"
+        )
 
-        // 4️⃣ Compute diff
-        let diff: DiffResult = { added: [], removed: [], modified: [] }
+        // 5️⃣ Run Explainer using stored diff
+        const explanation = await runExplainer(
+            newVersion.diff,
+            plan.reasoning
+        )
 
-        if (currentAst) {
-            diff = diffAST(currentAst, newAst)
-        }
-        console.log("Diff:", JSON.stringify(diff, null, 2))
+        // 6️⃣ Update explanation inside stored version
+        newVersion.explanation = explanation
 
-        // 5️⃣ Run Explainer
-        const explanation = await runExplainer(diff, plan.reasoning)
-        console.log("Explanation:", explanation)
-
-        // 6️⃣ Store version
-        const newVersion = versionStore.create(newAst, explanation)
-
-        return res.json({
-            versionId: newVersion.id,
-            ast: newVersion.ast,
-            explanation: newVersion.explanation,
-            diff: newVersion.diff,
-            timestamp: newVersion.timestamp
-        })
+        return res.json(newVersion)
 
     } catch (error: any) {
         console.error(error)
@@ -66,10 +61,20 @@ router.post("/", async (req, res) => {
 
 router.post("/validate-ast", (req, res) => {
     try {
-        const { ast } = req.body
+        const { ast, sessionId } = req.body
+
+        if (!sessionId) {
+            return res.status(400).json({ error: "SessionId required" })
+        }
 
         const validated = parseUIAst(ast)
-        const version = versionStore.create(validated, "Manual AST edit")
+
+        const version = versionStore.create(
+            sessionId,
+            validated,
+            "Manual AST edit"
+        )
+
         res.json(version)
 
     } catch (err: any) {
@@ -78,5 +83,6 @@ router.post("/validate-ast", (req, res) => {
         })
     }
 })
+
 
 export default router
