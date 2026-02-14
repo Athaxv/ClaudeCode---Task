@@ -14,6 +14,7 @@
   "dependencies": {
     "@repo/db": "workspace:*",
     "@repo/agent": "workspace:*",
+    "@repo/schema": "workspace:*",
     "@repo/versioning": "workspace:*",
     "@types/express": "^5.0.6",
     "@types/ws": "^8.18.1",
